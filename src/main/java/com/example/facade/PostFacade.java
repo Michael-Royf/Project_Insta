@@ -12,7 +12,16 @@ public class PostFacade {
     private ModelMapper mapper;
 
     public PostDto postToPostDto(PostEntity post){
-        PostDto postDto = mapper.map(post, PostDto.class);
+//        PostDto postDto = mapper.map(post, PostDto.class);
+//        return postDto;
+        PostDto postDto = new PostDto();
+        postDto.setUsername(post.getUser().getUsername());
+        postDto.setId(post.getId());
+        postDto.setCaption(post.getCaption());
+        postDto.setLikes(post.getLikes());
+        postDto.setUsersLiked(post.getUsersLiked());
+        postDto.setLocation(post.getLocation());
+        postDto.setTitle(post.getTitle());
         return postDto;
     }
 

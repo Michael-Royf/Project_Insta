@@ -41,7 +41,6 @@ public class PostService {
         post.setLocation(postDto.getLocation());
         post.setTitle(postDto.getTitle());
         post.setLikes(0);
-
         LOG.info("Saving Post for User: {}", user.getEmail());
         return postRepository.save(post);
     }
@@ -64,15 +63,15 @@ public class PostService {
 
     public PostEntity likePost(Long postId, String username) {
         PostEntity post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException("Post cannot be found"));
-        Optional<String> userLiked = post.getLikesUsers()
+        Optional<String> userLiked = post.getUsersLiked()
                 .stream()
                 .filter(u -> u.equals(username)).findAny();
         if (userLiked.isPresent()) {
             post.setLikes(post.getLikes() - 1);
-            post.getLikesUsers().remove(username);
+            post.getUsersLiked().remove(username);
         } else {
             post.setLikes(post.getLikes() + 1);
-            post.getLikesUsers().add(username);
+            post.getUsersLiked().add(username);
         }
         return postRepository.save(post);
     }

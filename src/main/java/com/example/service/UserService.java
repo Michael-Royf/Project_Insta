@@ -34,11 +34,12 @@ public class UserService {
     public UserEntity createUser(SignupRequest userIn) {
         UserEntity user = new UserEntity();
         user.setEmail(userIn.getEmail());
-        user.setName(userIn.getFirstname());
+        user.setName(userIn.getName());
         user.setLastname(userIn.getLastname());
         user.setUsername(userIn.getUsername());
         user.setPassword(passwordEncoder.encode(userIn.getPassword()));
         user.getRole().add(ERole.USER);
+        System.out.println(user.getRole());
         try {
             log.info("Saving User {}", userIn.getEmail());
             return userRepository.save(user);
@@ -50,7 +51,7 @@ public class UserService {
 
     public UserEntity updateUser(UserDto userDto, Principal principal) {
         UserEntity user = getUserByPrincipal(principal);
-        user.setName(userDto.getFirstname());
+        user.setName(userDto.getName());
         user.setLastname(userDto.getLastname());
         user.setBio(userDto.getBio());
         return userRepository.save(user);

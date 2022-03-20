@@ -14,6 +14,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import javax.management.relation.Role;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -43,11 +44,13 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
             if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
                 try {
                     String token = authorizationHeader.substring("Bearer ".length());
+
                     Algorithm algorithm = Algorithm.HMAC256(SecurityConstant.SECRET.getBytes());
                     JWTVerifier verifier = JWT.require(algorithm).build();
                     DecodedJWT decodedJWT = verifier.verify(token);
                     String username = decodedJWT.getSubject();
-                    String[] roles = decodedJWT.getClaim("role").asArray(String.class);
+                    String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
+
                     Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
                     stream(roles).forEach(role -> {
                         authorities.add(new SimpleGrantedAuthority(role));

@@ -8,7 +8,7 @@ import javax.validation.constraints.NotEmpty;
 public class UserDto {
     private  Long id;
     @NotEmpty
-    private String firstname;
+    private String name;
     @NotEmpty
     private String lastname;
     @NotEmpty
