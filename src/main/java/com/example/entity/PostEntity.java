@@ -9,12 +9,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Table(name = "post")
+
 @Entity
 @Data
-
+@Table(name = "post")
 public class PostEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;

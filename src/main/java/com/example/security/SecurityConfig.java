@@ -35,7 +35,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests()
-                .mvcMatchers("/api/auth/login/**", "/api/auth/token/refresh/**", "/api/auth/signup").permitAll()
+                .mvcMatchers("/api/auth/login/**", "/api/auth/token/refresh/**", "/api/auth/signup","/api/auth/confirm/**").permitAll()
                 .anyRequest().authenticated();
         http.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint);
 

@@ -54,6 +54,11 @@ public class AuthController {
     }
 
 
+    @GetMapping(path = "confirm")
+    public String confirm(@RequestParam("token") String token) {
+        return userService.confirmToken(token);
+    }
+
     @PostMapping("/token/refresh")
     public void refreshToken(HttpServletRequest request,
                              HttpServletResponse response) throws IOException {
