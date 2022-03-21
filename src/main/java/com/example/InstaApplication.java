@@ -8,10 +8,9 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 public class InstaApplication {
     @Bean
-    public ModelMapper modelMapper(){
+    public ModelMapper modelMapper() {
         return new ModelMapper();
         //post not work
-      //
     }
 
     public static void main(String[] args) {

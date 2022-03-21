@@ -2,7 +2,7 @@ package com.example.entity;
 
 import com.example.entity.enums.ERole;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Data;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -12,6 +12,7 @@ import java.util.*;
 
 @Entity
 @Data
+@NoArgsConstructor
 @Table(name = "user")
 public class UserEntity implements UserDetails  {
     @Id
@@ -30,6 +31,9 @@ public class UserEntity implements UserDetails  {
     @Column(length = 3000)
     private String password;
 
+    private Boolean locked = false;
+    private Boolean enabled = false;
+
 
     @ElementCollection(targetClass = ERole.class)//зависимость ролей
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
@@ -47,8 +51,7 @@ public class UserEntity implements UserDetails  {
   @Transient
    private Collection<? extends GrantedAuthority> authorities;
 
-    public UserEntity() {
-    }
+
 
     public UserEntity(Long id,
                       String username,
@@ -67,8 +70,6 @@ public class UserEntity implements UserDetails  {
         this.createDate = LocalDateTime.now();
     }
 
-
-
     @Override
     public String getPassword() {
         return password;
@@ -81,7 +82,7 @@ public class UserEntity implements UserDetails  {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return !locked;
     }
 
     @Override
@@ -91,11 +92,11 @@ public class UserEntity implements UserDetails  {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return enabled;
     }
 
 
-
-
-
+//    public String getUsername() {
+//        return email;
+//    }
 }
