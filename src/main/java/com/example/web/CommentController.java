@@ -6,6 +6,8 @@ import com.example.facade.CommentFacade;
 import com.example.payload.response.MessageResponse;
 import com.example.service.CommentService;
 import com.example.validations.ResponseErrorValidation;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +33,7 @@ public class CommentController {
 
 
     @PostMapping("/{postId}/create")
-    public ResponseEntity<Object> createComment(@Valid @RequestBody CommentDto commentDto,
+       public ResponseEntity<Object> createComment(@Valid @RequestBody CommentDto commentDto,
                                                 @PathVariable("postId") String postId, BindingResult bindingResult,
                                                 Principal principal) {
 
@@ -44,12 +46,11 @@ public class CommentController {
     }
 
     @GetMapping("/{postId}/all")
-    public ResponseEntity<List<CommentDto>> getALlCommentToPost(@PathVariable("postId") String postId) {
+     public ResponseEntity<List<CommentDto>> getALlCommentToPost(@PathVariable("postId") String postId) {
         List<CommentDto> commentDtoList = commentService.getAllCommentsForPost(Long.parseLong(postId))
                 .stream()
                 .map(commentFacade::commentToCommentDTO)
                 .collect(Collectors.toList());
-
         return  new ResponseEntity<>(commentDtoList, HttpStatus.OK);
     }
 
@@ -57,7 +58,6 @@ public class CommentController {
     public ResponseEntity<MessageResponse> deleteComment(@PathVariable("commentId") String commentId){
         commentService.deleteComment(Long.parseLong(commentId));
         return new ResponseEntity<>(new MessageResponse("Post was deleted"), HttpStatus.OK);
-
     }
 
 

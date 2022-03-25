@@ -35,7 +35,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests()
-                .mvcMatchers("/api/auth/login/**", "/api/auth/token/refresh/**", "/api/auth/signup","/api/auth/confirm/**").permitAll()
+                .antMatchers("/resources/**", "/swagger*/**").permitAll()
+                .antMatchers("/swagger-resources",
+                        "/configuration/security",
+                        "/configuration/ui",
+                        "/swagger-ui",
+                        "/v2/api-docs",
+                        "/v3/api-docs",
+                        "/webjars",
+                        "/auth",
+                        "/reset").permitAll()
+                .mvcMatchers("/api/auth/login/**", "/api/auth/token/refresh/**", "/api/auth/signup", "/api/auth/confirm/**").permitAll()
                 .anyRequest().authenticated();
         http.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint);
 

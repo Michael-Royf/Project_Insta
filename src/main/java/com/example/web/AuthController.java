@@ -12,6 +12,8 @@ import com.example.security.SecurityConstant;
 import com.example.service.UserService;
 import com.example.validations.ResponseErrorValidation;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -31,9 +33,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 
 @RestController
-@RequestMapping("api/auth")
+@RequestMapping("/api/auth")
 @PreAuthorize("permitAll()")
 @CrossOrigin
+
 public class AuthController {
 
     @Autowired
@@ -45,7 +48,7 @@ public class AuthController {
 
     //регистрация нового пользователя
     @PostMapping("/signup")
-    public ResponseEntity<Object> registerUser(@Valid @RequestBody SignupRequest signupRequest,
+      public ResponseEntity<Object> registerUser(@Valid @RequestBody SignupRequest signupRequest,
                                                BindingResult bindingResult) {
         ResponseEntity<Object> errors = responseErrorValidation.mapValidationService(bindingResult);
         if (!ObjectUtils.isEmpty(errors)) return errors;
@@ -58,6 +61,7 @@ public class AuthController {
     public String confirm(@RequestParam("token") String token) {
         return userService.confirmToken(token);
     }
+
 
     @PostMapping("/token/refresh")
     public void refreshToken(HttpServletRequest request,
