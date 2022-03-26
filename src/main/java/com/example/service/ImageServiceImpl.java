@@ -3,14 +3,14 @@ package com.example.service;
 import com.example.entity.ImageModelEntity;
 import com.example.entity.PostEntity;
 import com.example.entity.UserEntity;
-import com.example.exceptions.ImageNotFoundException;
+import com.example.exceptions.domain.ImageNotFoundException;
 import com.example.repository.ImageRepository;
 import com.example.repository.PostRepository;
 import com.example.repository.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.example.service.interf.ImageService;
+import com.example.utility.GetUserByPrincipal;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,23 +25,27 @@ import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
 @Service
-public class ImageService {
-    public static final Logger LOG = LoggerFactory.getLogger(ImageService.class);
+@Slf4j
+public class ImageServiceImpl implements ImageService {
 
-    private ImageRepository imageRepository;
-    private UserRepository userRepository;
-    private PostRepository postRepository;
+    private final  ImageRepository imageRepository;
+    private final UserRepository userRepository;
+    private final PostRepository postRepository;
+    private final GetUserByPrincipal getUserByPrincipal;
+
 
     @Autowired
-    public ImageService(ImageRepository imageRepository, UserRepository userRepository, PostRepository postRepository) {
+    public ImageServiceImpl(ImageRepository imageRepository, UserRepository userRepository, PostRepository postRepository, GetUserByPrincipal getUserByPrincipal) {
         this.imageRepository = imageRepository;
         this.userRepository = userRepository;
         this.postRepository = postRepository;
+        this.getUserByPrincipal = getUserByPrincipal;
     }
 
+    @Override
     public ImageModelEntity uploadImageToUser(MultipartFile file, Principal principal) throws IOException {
-        UserEntity user = getUserByPrincipal(principal);
-        LOG.info("Uploading image profile to user {}", user.getUsername());
+        UserEntity user = getUserByPrincipal.getUserByPrincipal(principal);
+        log.info("Uploading image profile to user {}", user.getUsername());
 
         ImageModelEntity userProfileImage = imageRepository.findByUserId(user.getId()).orElse(null);
         if (!ObjectUtils.isEmpty(userProfileImage)) {
@@ -54,9 +58,9 @@ public class ImageService {
         return imageRepository.save(imageModel);
     }
 
+    @Override
     public ImageModelEntity uploadImageToPost(MultipartFile file, Principal principal, Long postId) throws IOException {
-
-        UserEntity user = getUserByPrincipal(principal);
+        UserEntity user = getUserByPrincipal.getUserByPrincipal(principal);
         PostEntity post = user.getPosts()
                 .stream()
                 // .filter(p -> p.getId().equals(postId))
@@ -68,32 +72,30 @@ public class ImageService {
         imageModel.setImageBytes(file.getBytes());
         imageModel.setImageBytes(compressBytes(file.getBytes()));
         imageModel.setName(file.getOriginalFilename());
-        LOG.info("Uploading image to Post {}", post.getId());
-
+        log.info("Uploading image to Post {}", post.getId());
         return imageRepository.save(imageModel);
     }
 
-
+    @Override
     public ImageModelEntity getImageToUser(Principal principal) {
-        UserEntity user = getUserByPrincipal(principal);
+        UserEntity user = getUserByPrincipal.getUserByPrincipal(principal);
 
         ImageModelEntity imageModel = imageRepository.findByUserId(user.getId()).orElse(null);
         if (!ObjectUtils.isEmpty(imageModel)) {
             imageModel.setImageBytes(decompressBytes(imageModel.getImageBytes()));
         }
-
         return imageModel;
     }
+
+    @Override
     public ImageModelEntity getImageToPost(Long postId) {
         ImageModelEntity imageModel = imageRepository.findByPostId(postId)
                 .orElseThrow(() -> new ImageNotFoundException("Cannot find image to Post: " + postId));
         if (!ObjectUtils.isEmpty(imageModel)) {
             imageModel.setImageBytes(decompressBytes(imageModel.getImageBytes()));
         }
-
         return imageModel;
     }
-
 
     private <T> Collector<T, ?, T> toSinglePostCollector() {//помогает вернуть единственный пост для юзера
         return Collectors.collectingAndThen(
@@ -121,13 +123,11 @@ public class ImageService {
         try {
             outputStream.close();
         } catch (IOException e) {
-            LOG.error("Cannot compress Bytes");
+            log.error("Cannot compress Bytes");
         }
         System.out.println("Compressed Image Byte Size - " + outputStream.toByteArray().length);
         return outputStream.toByteArray();
     }
-
-
 
     private static byte[] decompressBytes(byte[] data) {
         Inflater inflater = new Inflater();
@@ -141,16 +141,8 @@ public class ImageService {
             }
             outputStream.close();
         } catch (DataFormatException | IOException e) {
-            LOG.error("Cannot decompress Bytes");
+            log.error("Cannot decompress Bytes");
         }
         return outputStream.toByteArray();
     }
-
-
-    private UserEntity getUserByPrincipal(Principal principal) {
-        String username = principal.getName();
-        return userRepository.findUserByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Username not found " + username));
-    }
-
 }

@@ -2,12 +2,11 @@ package com.example.web;
 
 import com.example.dto.CommentDto;
 import com.example.entity.CommentEntity;
+import com.example.exceptions.GlobalExceptionHandler;
 import com.example.facade.CommentFacade;
 import com.example.payload.response.MessageResponse;
-import com.example.service.CommentService;
+import com.example.service.CommentServiceImpl;
 import com.example.validations.ResponseErrorValidation;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +22,9 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("api/comment")
 @CrossOrigin
-public class CommentController {
+public class CommentController extends GlobalExceptionHandler {
     @Autowired
-    private CommentService commentService;
+    private CommentServiceImpl commentService;
     @Autowired
     private CommentFacade commentFacade;
     @Autowired

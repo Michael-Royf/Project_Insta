@@ -17,7 +17,6 @@ import java.util.Collection;
 @Transactional
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
-
     private final UserRepository userRepository;
 
     @Autowired
@@ -32,12 +31,9 @@ public class CustomUserDetailsService implements UserDetailsService {
         return build(user);
     }
 
-
     public UserEntity loadUserById(Long id){
         return userRepository.findUserById(id).orElse(null);
     }
-
-
 
     public static User build(UserEntity user){
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();

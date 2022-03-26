@@ -1,8 +1,9 @@
 package com.example.web;
 
 import com.example.entity.ImageModelEntity;
+import com.example.exceptions.GlobalExceptionHandler;
 import com.example.payload.response.MessageResponse;
-import com.example.service.ImageService;
+import com.example.service.ImageServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,9 +16,9 @@ import java.security.Principal;
 @RestController
 @RequestMapping("api/image")
 @CrossOrigin
-public class ImageController {
+public class ImageController extends GlobalExceptionHandler {
     @Autowired
-    private ImageService imageService;
+    private ImageServiceImpl imageService;
 
     @PostMapping("/upload")
     public ResponseEntity<MessageResponse> uploadImageToUser(@RequestParam("file") MultipartFile file,

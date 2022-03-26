@@ -2,8 +2,9 @@ package com.example.web;
 
 import com.example.dto.UserDto;
 import com.example.entity.UserEntity;
+import com.example.exceptions.GlobalExceptionHandler;
 import com.example.facade.UserFacade;
-import com.example.service.UserService;
+import com.example.service.UserServiceImpl;
 import com.example.validations.ResponseErrorValidation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,9 +19,9 @@ import java.security.Principal;
 @RestController
 @RequestMapping("api/user")
 @CrossOrigin
-public class UserController {
+public class UserController extends GlobalExceptionHandler {
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userService;
     @Autowired
     private UserFacade userFacade;
     @Autowired

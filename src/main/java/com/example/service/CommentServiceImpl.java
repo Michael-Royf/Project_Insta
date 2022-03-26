@@ -4,14 +4,15 @@ import com.example.dto.CommentDto;
 import com.example.entity.CommentEntity;
 import com.example.entity.PostEntity;
 import com.example.entity.UserEntity;
-import com.example.exceptions.PostNotFoundException;
+import com.example.exceptions.domain.PostNotFoundException;
 import com.example.repository.CommentRepository;
 import com.example.repository.PostRepository;
 import com.example.repository.UserRepository;
+import com.example.service.interf.CommentService;
+import com.example.utility.GetUserByPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
@@ -19,22 +20,25 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class CommentService {
-    public static final Logger LOG = LoggerFactory.getLogger(CommentService.class);
+public class CommentServiceImpl implements CommentService {
+    public static final Logger LOG = LoggerFactory.getLogger(CommentServiceImpl.class);
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final GetUserByPrincipal getUserByPrincipal;
 
     @Autowired
-    public CommentService(CommentRepository commentRepository, PostRepository postRepository, UserRepository userRepository) {
+    public CommentServiceImpl(CommentRepository commentRepository, PostRepository postRepository, UserRepository userRepository, GetUserByPrincipal getUserByPrincipal) {
         this.commentRepository = commentRepository;
         this.postRepository = postRepository;
         this.userRepository = userRepository;
+        this.getUserByPrincipal = getUserByPrincipal;
     }
 
+    @Override
     public CommentEntity saveComment(Long postId, CommentDto commentDto, Principal principal) {
-        UserEntity user = getUserByPrincipal(principal);
+        UserEntity user = getUserByPrincipal.getUserByPrincipal(principal);
         PostEntity post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException("Post cannot be found for username: " + user.getEmail()));
         CommentEntity comment = new CommentEntity();
@@ -46,7 +50,7 @@ public class CommentService {
         return commentRepository.save(comment);
     }
 
-
+    @Override
     public List<CommentEntity> getAllCommentsForPost(Long postId) {
         PostEntity post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException("Post cannot be found"));
@@ -54,17 +58,9 @@ public class CommentService {
         return comments;
     }
 
+    @Override
     public void deleteComment(Long commentID) {
         Optional<CommentEntity> comment = commentRepository.findById(commentID);
         comment.ifPresent(commentRepository::delete);
-
     }
-
-
-    private UserEntity getUserByPrincipal(Principal principal) {
-        String username = principal.getName();
-        return userRepository.findUserByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Username not found " + username));
-    }
-
 }

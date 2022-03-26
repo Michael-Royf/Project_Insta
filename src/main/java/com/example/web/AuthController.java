@@ -6,14 +6,13 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.entity.UserEntity;
 import com.example.entity.enums.ERole;
+import com.example.exceptions.GlobalExceptionHandler;
 import com.example.payload.request.SignupRequest;
 import com.example.payload.response.MessageResponse;
-import com.example.security.SecurityConstant;
-import com.example.service.UserService;
+import com.example.constant.SecurityConstant;
+import com.example.service.UserServiceImpl;
 import com.example.validations.ResponseErrorValidation;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -37,14 +36,20 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @PreAuthorize("permitAll()")
 @CrossOrigin
 
-public class AuthController {
+public class AuthController extends GlobalExceptionHandler {
 
     @Autowired
     private ResponseErrorValidation responseErrorValidation;
     @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userService;
+
+
+    @GetMapping("/home")
+    public String hello(){
+        return "Hello michael!";
+    }
 
     //регистрация нового пользователя
     @PostMapping("/signup")

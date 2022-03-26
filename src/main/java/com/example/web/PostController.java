@@ -2,9 +2,10 @@ package com.example.web;
 
 import com.example.dto.PostDto;
 import com.example.entity.PostEntity;
+import com.example.exceptions.GlobalExceptionHandler;
 import com.example.facade.PostFacade;
 import com.example.payload.response.MessageResponse;
-import com.example.service.PostService;
+import com.example.service.PostServiceImpl;
 import com.example.validations.ResponseErrorValidation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,11 +22,11 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("api/post")
 @CrossOrigin
-public class PostController {
+public class PostController extends GlobalExceptionHandler {
     @Autowired
     private PostFacade postFacade;
     @Autowired
-    private PostService postService;
+    private PostServiceImpl postService;
     @Autowired
     private ResponseErrorValidation responseErrorValidation;
 
