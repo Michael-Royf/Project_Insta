@@ -19,7 +19,7 @@ import java.security.Principal;
 @RestController
 @RequestMapping("api/user")
 @CrossOrigin
-public class UserController extends GlobalExceptionHandler {
+public class UserController {
     @Autowired
     private UserServiceImpl userService;
     @Autowired

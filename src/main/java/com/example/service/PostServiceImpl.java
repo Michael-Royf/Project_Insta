@@ -13,6 +13,7 @@ import com.example.utility.GetUserByPrincipal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import static  com.example.constant.UserImplConstant.*;
 
 import java.security.Principal;
 import java.util.List;
@@ -53,10 +54,10 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostEntity getPostById(Long postId, Principal principal) {
+    public PostEntity getPostById(Long postId, Principal principal) throws PostNotFoundException {
         UserEntity user = getUserByPrincipal.getUserByPrincipal(principal);
         return postRepository.findPostByIdAndUser(postId, user)
-                .orElseThrow(() -> new PostNotFoundException("Post cannot be found for username: " + user.getEmail()));
+                .orElseThrow(() -> new PostNotFoundException(NO_POST_FOUND_BY_ID + postId));
     }
 
     @Override
@@ -66,8 +67,9 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostEntity likePost(Long postId, String username) {
-        PostEntity post = postRepository.findById(postId).orElseThrow(() -> new PostNotFoundException("Post cannot be found"));
+    public PostEntity likePost(Long postId, String username) throws PostNotFoundException {
+        PostEntity post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException(NO_POST_FOUND_BY_ID  + postId));
         Optional<String> userLiked = post.getUsersLiked()
                 .stream()
                 .filter(u -> u.equals(username)).findAny();
@@ -82,7 +84,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public void deletePost(Long postId, Principal principal) {
+    public void deletePost(Long postId, Principal principal) throws PostNotFoundException {
         PostEntity post = getPostById(postId, principal);
         Optional<ImageModelEntity> imageModel = imageRepository.findByPostId(post.getId());
         postRepository.delete(post);

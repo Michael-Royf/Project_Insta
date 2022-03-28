@@ -2,6 +2,7 @@ package com.example.web;
 
 import com.example.entity.ImageModelEntity;
 import com.example.exceptions.GlobalExceptionHandler;
+import com.example.exceptions.domain.ImageNotFoundException;
 import com.example.payload.response.MessageResponse;
 import com.example.service.ImageServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ import java.security.Principal;
 @RestController
 @RequestMapping("api/image")
 @CrossOrigin
-public class ImageController extends GlobalExceptionHandler {
+public class ImageController {
     @Autowired
     private ImageServiceImpl imageService;
 
@@ -43,7 +44,7 @@ public class ImageController extends GlobalExceptionHandler {
 
 
     @GetMapping("{postId}/image")
-    public ResponseEntity<ImageModelEntity> getImageToPost(@PathVariable ("postId") String postId){
+    public ResponseEntity<ImageModelEntity> getImageToPost(@PathVariable ("postId") String postId) throws ImageNotFoundException {
         ImageModelEntity postImage = imageService.getImageToPost(Long.parseLong(postId));
         return new ResponseEntity<>(postImage, HttpStatus.OK);
     }

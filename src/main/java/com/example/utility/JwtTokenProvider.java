@@ -11,7 +11,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -30,8 +29,8 @@ public class JwtTokenProvider {
         String[] claims = getClaimsFromUser(userEntity);
         return JWT
                 .create()
-                .withIssuer(GET_ARRAYS_LLC)
-                .withAudience(GET_ARRAYS_ADMINISTRATION)
+                .withIssuer(PROJECT_INSTA_LLC)
+                .withAudience(PROJECT_INSTA_ADMINISTRATION)
                 .withIssuedAt(new Date())
                 .withSubject(userEntity.getUsername())
                 .withArrayClaim(AUTHORITIES, claims)
@@ -77,7 +76,7 @@ public class JwtTokenProvider {
         JWTVerifier verifier;
         try {
             Algorithm algorithm = HMAC512(SECRET);
-            verifier = JWT.require(algorithm).withIssuer(GET_ARRAYS_LLC).build();
+            verifier = JWT.require(algorithm).withIssuer(PROJECT_INSTA_LLC).build();
         }catch (JWTVerificationException exception) {
             throw new JWTVerificationException(TOKEN_CANNOT_BE_VERIFIED);
         }

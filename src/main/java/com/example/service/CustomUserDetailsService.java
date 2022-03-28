@@ -14,28 +14,35 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import static com.example.constant.UserImplConstant.NO_USER_FOUND_BY_USERNAME;
+
 @Transactional
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
+    private final LoginAttemptService loginAttemptService;
 
     @Autowired
-    public CustomUserDetailsService(UserRepository userRepository) {
+    public CustomUserDetailsService(UserRepository userRepository, LoginAttemptService loginAttemptService) {
         this.userRepository = userRepository;
+        this.loginAttemptService = loginAttemptService;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserEntity user = userRepository.findUserByEmail(username)
-                .orElseThrow(()->new UsernameNotFoundException("Username not found with username: " + username));
+                .orElseThrow(() -> new UsernameNotFoundException(NO_USER_FOUND_BY_USERNAME + username));
+
+        validateLoginAttempt(user);
         return build(user);
     }
 
-    public UserEntity loadUserById(Long id){
+
+    public UserEntity loadUserById(Long id) {
         return userRepository.findUserById(id).orElse(null);
     }
 
-    public static User build(UserEntity user){
+    public static User build(UserEntity user) {
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
         user.getRole().forEach(role -> {
             authorities.add(new SimpleGrantedAuthority(role.name()));
@@ -46,5 +53,17 @@ public class CustomUserDetailsService implements UserDetailsService {
                 user.getPassword(),
                 authorities
         );
+    }
+
+    private void validateLoginAttempt(UserEntity user) {
+        if(user.isAccountNonLocked()) {
+            if(loginAttemptService.hasExceededMaxAttempts(user.getUsername())) {
+                user.setIsNotLocked(false);
+            } else {
+                user.setIsNotLocked(true);
+            }
+        } else {
+            loginAttemptService.evictUserFromLoginAttemptCache(user.getUsername());
+        }
     }
 }

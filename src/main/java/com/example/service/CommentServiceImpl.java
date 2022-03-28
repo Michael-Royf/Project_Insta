@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import static com.example.constant.UserImplConstant.*;
 
 import java.security.Principal;
 import java.util.List;
@@ -37,10 +38,10 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentEntity saveComment(Long postId, CommentDto commentDto, Principal principal) {
+    public CommentEntity saveComment(Long postId, CommentDto commentDto, Principal principal) throws PostNotFoundException {
         UserEntity user = getUserByPrincipal.getUserByPrincipal(principal);
         PostEntity post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("Post cannot be found for username: " + user.getEmail()));
+                .orElseThrow(() -> new PostNotFoundException(NO_POST_FOUND_BY_USERNAME+ user.getUsername()));
         CommentEntity comment = new CommentEntity();
         comment.setPost(post);
         comment.setUserId(user.getId());
@@ -51,9 +52,9 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentEntity> getAllCommentsForPost(Long postId) {
+    public List<CommentEntity> getAllCommentsForPost(Long postId) throws PostNotFoundException {
         PostEntity post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("Post cannot be found"));
+                .orElseThrow(() -> new PostNotFoundException(NO_POST_FOUND_BY_ID + postId));
         List<CommentEntity> comments = commentRepository.findAllByPost(post);
         return comments;
     }

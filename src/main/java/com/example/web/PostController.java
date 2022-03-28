@@ -2,7 +2,7 @@ package com.example.web;
 
 import com.example.dto.PostDto;
 import com.example.entity.PostEntity;
-import com.example.exceptions.GlobalExceptionHandler;
+import com.example.exceptions.domain.PostNotFoundException;
 import com.example.facade.PostFacade;
 import com.example.payload.response.MessageResponse;
 import com.example.service.PostServiceImpl;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("api/post")
 @CrossOrigin
-public class PostController extends GlobalExceptionHandler {
+public class PostController  {
     @Autowired
     private PostFacade postFacade;
     @Autowired
@@ -62,13 +62,13 @@ public class PostController extends GlobalExceptionHandler {
 
     @PostMapping("/{postId}/{username}/like")
     public ResponseEntity<PostDto> likePost(@PathVariable ("postId") String postId,
-                                            @PathVariable("username") String username){
+                                            @PathVariable("username") String username) throws PostNotFoundException {
         PostEntity post = postService.likePost(Long.parseLong(postId), username);
         PostDto postDto  = postFacade.postToPostDto(post);
         return  new ResponseEntity<>(postDto, HttpStatus.OK);
     }
     @DeleteMapping("/{postId}/delete")
-    public ResponseEntity<MessageResponse> deletePost(@PathVariable("postId") String postId, Principal principal){
+    public ResponseEntity<MessageResponse> deletePost(@PathVariable("postId") String postId, Principal principal) throws PostNotFoundException {
         postService.deletePost(Long.parseLong(postId), principal);
         return  new ResponseEntity<>(new MessageResponse("Post wes deleted"), HttpStatus.OK);
     }

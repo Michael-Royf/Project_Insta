@@ -1,6 +1,4 @@
-package com.example.exceptions.domain1;
-
-import com.example.constant.ExceptionConstant;
+package com.example.exceptions.domain;
 
 public class EmailExistException extends Exception {
     public EmailExistException(String message) {

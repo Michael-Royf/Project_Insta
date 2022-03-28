@@ -29,8 +29,8 @@ public class EmailSenderImpl implements EmailSender {
             helper.setFrom("instaprojectmichael@gmail.com");
             mailSender.send(mimeMessage);
         }catch (MessagingException e){
-            log.error("failed to send email", e);
-            throw new IllegalStateException("failed to send email");
+            log.error("Failed to send email", e);
+            throw new IllegalStateException("Failed to send email");
 
         }
     }

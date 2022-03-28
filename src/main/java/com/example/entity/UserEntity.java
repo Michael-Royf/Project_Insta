@@ -31,7 +31,7 @@ public class UserEntity implements UserDetails  {
     @Column(length = 3000)
     private String password;
 
-    private Boolean locked = false;
+    private Boolean isNotLocked;
     private Boolean enabled = false;
 
 
@@ -82,9 +82,11 @@ public class UserEntity implements UserDetails  {
 
     @Override
     public boolean isAccountNonLocked() {
-        return !locked;
+        return this.isNotLocked;
     }
-
+    public boolean isNotLocked() {
+        return isNotLocked;
+    }
     @Override
     public boolean isCredentialsNonExpired() {
         return true;

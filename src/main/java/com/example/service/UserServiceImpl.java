@@ -1,11 +1,13 @@
 package com.example.service;
 
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.example.dto.UserDto;
 import com.example.entity.ConfirmationTokenEntity;
 import com.example.entity.UserEntity;
 import com.example.entity.enums.ERole;
-import com.example.exceptions.domain.UserExistException;
+import com.example.exceptions.domain.UserNotFoundException;
+import com.example.exceptions.domain.UsernameExistException;
 import com.example.payload.request.SignupRequest;
 import com.example.repository.UserRepository;
 import com.example.service.interf.EmailSender;
@@ -23,6 +25,8 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static com.example.constant.UserImplConstant.*;
+
 @Service
 @Transactional
 @Slf4j
@@ -35,10 +39,13 @@ public class UserServiceImpl implements UserService {
     private final EmailBuilder emailBuilder;
     private final GetUserByPrincipal getUserByPrincipal;
 
+
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
                            BCryptPasswordEncoder passwordEncoder,
-                           ConfirmationTokenServiceImpl confirmationTokenService, EmailSender emailSender, EmailBuilder emailBuilder, GetUserByPrincipal getUserByPrincipal) {
+                           ConfirmationTokenServiceImpl confirmationTokenService,
+                           EmailSender emailSender, EmailBuilder emailBuilder,
+                           GetUserByPrincipal getUserByPrincipal) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.confirmationTokenService = confirmationTokenService;
@@ -48,13 +55,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserEntity createUser(SignupRequest userIn) {
+    public UserEntity createUser(SignupRequest userIn) throws UsernameExistException {
         UserEntity user = new UserEntity();
         user.setEmail(userIn.getEmail());
         user.setName(userIn.getName());
         user.setLastname(userIn.getLastname());
         user.setUsername(userIn.getUsername());
         user.setPassword(passwordEncoder.encode(userIn.getPassword()));
+        user.setIsNotLocked(true);
         user.getRole().add(ERole.USER);
 
         //token for email sender
@@ -66,17 +74,15 @@ public class UserServiceImpl implements UserService {
                 user
         );
         String link = "http://localhost:8080/api/auth/confirm?token=" + token;
-        emailSender.send(userIn.getEmail(), emailBuilder.buildEmail(userIn.getName(), link));
         UserEntity userEntity;
         try {
             log.info("Saving User {}", userIn.getEmail());
             //exception
-
             userEntity = userRepository.save(user);
             confirmationTokenService.saveConfirmationToken(confirmationToken);
         } catch (Exception e) {
             log.error("Error during registration. {}", e.getMessage());
-            throw new UserExistException("The user " + user.getUsername() + " already exist. Please check credentials");
+            throw new UsernameExistException(USERNAME_ALREADY_EXISTS);
         }
         emailSender.send(userIn.getEmail(), emailBuilder.buildEmail(userIn.getName(), link));
         return userEntity;
@@ -89,18 +95,18 @@ public class UserServiceImpl implements UserService {
         ConfirmationTokenEntity confirmationToken = confirmationTokenService
                 .getToken(token)
                 .orElseThrow(() ->
-                        new IllegalStateException("token not found"));
+                        new IllegalStateException("Token not found"));
         if (confirmationToken.getConfirmedAt() != null) {
-            throw new IllegalStateException("email already confirmed");
+            throw new IllegalStateException("Email already confirmed");
         }
         LocalDateTime expiredAt = confirmationToken.getExpiresAt();
 
         if (expiredAt.isBefore(LocalDateTime.now())) {
-            throw new IllegalStateException("token expired");
+            throw new TokenExpiredException("Token expired");
         }
         confirmationTokenService.setConfirmedAt(token);
         userRepository.enableUser(confirmationToken.getUser().getEmail());
-        return "confirmed";
+        return "Confirmed";
     }
 
     @Override
@@ -120,13 +126,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserEntity getUserById(Long userId) {
-        return userRepository.findUserById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return userRepository.findUserById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException(NO_USER_FOUND_BY_ID + userId));
     }
 
     @Override
-    public UserEntity getUserByUsername(String username) {
+    public UserEntity getUserByUsername(String username) throws UserNotFoundException {
         return userRepository.findUserByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(NO_USER_FOUND_BY_USERNAME + username));
     }
 
 

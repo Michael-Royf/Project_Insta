@@ -1,6 +1,7 @@
 package com.example.service.interf;
 
 import com.example.entity.ImageModelEntity;
+import com.example.exceptions.domain.ImageNotFoundException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -13,7 +14,7 @@ public interface ImageService {
 
     ImageModelEntity getImageToUser(Principal principal);
 
-    ImageModelEntity getImageToPost(Long postId);
+    ImageModelEntity getImageToPost(Long postId) throws ImageNotFoundException;
 
 
 }

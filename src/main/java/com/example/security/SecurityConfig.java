@@ -2,6 +2,7 @@ package com.example.security;
 
 import com.example.security.filter.CustomAuthenticationFilter;
 import com.example.security.filter.CustomAuthorizationFilter;
+import com.example.security.filter.JwtAccessDeniedHandler;
 import com.example.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -19,11 +20,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true, jsr250Enabled = true, proxyTargetClass = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    @Autowired
-    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-
+    //@Autowired
+   // private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
+    @Autowired
+     JwtAuthenticationEntryPoint111 jwtAuthenticationEntryPoint111;
+     @Autowired
+     private JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
 
     @Override
@@ -48,7 +52,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/reset").permitAll()
                 .mvcMatchers("/api/auth/login/**", "/api/auth/token/refresh/**", "/api/auth/signup", "/api/auth/confirm/**").permitAll()
                 .anyRequest().authenticated();
-        http.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint);
+        //   http.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint);
+       http.exceptionHandling().accessDeniedHandler(jwtAccessDeniedHandler).authenticationEntryPoint(jwtAuthenticationEntryPoint111);
 
 
     }

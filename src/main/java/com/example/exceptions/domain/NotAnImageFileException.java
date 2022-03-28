@@ -1,4 +1,4 @@
-package com.example.exceptions.domain1;
+package com.example.exceptions.domain;
 
 public class NotAnImageFileException extends Exception{
     public NotAnImageFileException(String message) {

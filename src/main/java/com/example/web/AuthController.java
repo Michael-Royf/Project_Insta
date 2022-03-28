@@ -6,7 +6,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.entity.UserEntity;
 import com.example.entity.enums.ERole;
-import com.example.exceptions.GlobalExceptionHandler;
+import com.example.exceptions.domain.UsernameExistException;
 import com.example.payload.request.SignupRequest;
 import com.example.payload.response.MessageResponse;
 import com.example.constant.SecurityConstant;
@@ -35,8 +35,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping("/api/auth")
 @PreAuthorize("permitAll()")
 @CrossOrigin
-
-public class AuthController extends GlobalExceptionHandler {
+// extends GlobalExceptionHandler
+public class AuthController {
 
     @Autowired
     private ResponseErrorValidation responseErrorValidation;
@@ -54,7 +54,7 @@ public class AuthController extends GlobalExceptionHandler {
     //регистрация нового пользователя
     @PostMapping("/signup")
       public ResponseEntity<Object> registerUser(@Valid @RequestBody SignupRequest signupRequest,
-                                               BindingResult bindingResult) {
+                                               BindingResult bindingResult) throws UsernameExistException {
         ResponseEntity<Object> errors = responseErrorValidation.mapValidationService(bindingResult);
         if (!ObjectUtils.isEmpty(errors)) return errors;
         userService.createUser(signupRequest);

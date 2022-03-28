@@ -2,7 +2,7 @@ package com.example.web;
 
 import com.example.dto.CommentDto;
 import com.example.entity.CommentEntity;
-import com.example.exceptions.GlobalExceptionHandler;
+import com.example.exceptions.domain.PostNotFoundException;
 import com.example.facade.CommentFacade;
 import com.example.payload.response.MessageResponse;
 import com.example.service.CommentServiceImpl;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("api/comment")
 @CrossOrigin
-public class CommentController extends GlobalExceptionHandler {
+public class CommentController  {
     @Autowired
     private CommentServiceImpl commentService;
     @Autowired
@@ -34,7 +34,7 @@ public class CommentController extends GlobalExceptionHandler {
     @PostMapping("/{postId}/create")
        public ResponseEntity<Object> createComment(@Valid @RequestBody CommentDto commentDto,
                                                 @PathVariable("postId") String postId, BindingResult bindingResult,
-                                                Principal principal) {
+                                                Principal principal) throws PostNotFoundException {
 
         ResponseEntity<Object> errors = responseErrorValidation.mapValidationService(bindingResult);
         if (!ObjectUtils.isEmpty(errors)) return errors;
@@ -45,7 +45,7 @@ public class CommentController extends GlobalExceptionHandler {
     }
 
     @GetMapping("/{postId}/all")
-     public ResponseEntity<List<CommentDto>> getALlCommentToPost(@PathVariable("postId") String postId) {
+     public ResponseEntity<List<CommentDto>> getALlCommentToPost(@PathVariable("postId") String postId) throws PostNotFoundException {
         List<CommentDto> commentDtoList = commentService.getAllCommentsForPost(Long.parseLong(postId))
                 .stream()
                 .map(commentFacade::commentToCommentDTO)

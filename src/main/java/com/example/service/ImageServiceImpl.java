@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
-
+import  static com.example.constant.UserImplConstant.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.Principal;
@@ -88,9 +88,11 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public ImageModelEntity getImageToPost(Long postId) {
+    public ImageModelEntity getImageToPost(Long postId) throws ImageNotFoundException {
         ImageModelEntity imageModel = imageRepository.findByPostId(postId)
-                .orElseThrow(() -> new ImageNotFoundException("Cannot find image to Post: " + postId));
+                .orElseThrow(()->new ImageNotFoundException(NO_IMAGE_FOUND_BY_POST + postId));
+
+        //    .orElseThrow(() -> new ImageNotFoundException("Cannot find image to Post: " + postId));
         if (!ObjectUtils.isEmpty(imageModel)) {
             imageModel.setImageBytes(decompressBytes(imageModel.getImageBytes()));
         }
