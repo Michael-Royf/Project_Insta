@@ -1,4 +1,4 @@
-package com.example.security;
+package com.example.security.v2;
 
 import com.example.constant.SecurityConstant;
 import com.example.payload.response.HttpResponse;

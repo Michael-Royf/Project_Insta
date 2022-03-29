@@ -1,5 +1,6 @@
 package com.example.dto;
 
+import com.example.entity.enums.ERole;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
@@ -14,4 +15,5 @@ public class UserDto {
     @NotEmpty
     private String username;
     private String bio;
+    private ERole erol;
 }

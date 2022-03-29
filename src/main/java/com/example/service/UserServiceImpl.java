@@ -63,7 +63,8 @@ public class UserServiceImpl implements UserService {
         user.setUsername(userIn.getUsername());
         user.setPassword(passwordEncoder.encode(userIn.getPassword()));
         user.setIsNotLocked(true);
-        user.getRole().add(ERole.USER);
+        user.setRoles(ERole.USER.name());
+        user.setAuthorities(ERole.USER.getAuthorities());
 
         //token for email sender
         String token = UUID.randomUUID().toString();

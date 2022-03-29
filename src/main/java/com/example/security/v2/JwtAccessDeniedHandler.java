@@ -1,4 +1,4 @@
-package com.example.security.filter;
+package com.example.security.v2;
 
 import com.example.payload.response.HttpResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
